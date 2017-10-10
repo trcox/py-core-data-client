@@ -1,4 +1,4 @@
-/*******************************************************************************
+#*******************************************************************************
  * Copyright 2016-2017 Dell Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -16,184 +16,148 @@
  * @version: 1.0.0
  *******************************************************************************/
 
-package org.edgexfoundry.controller.integration;
 
-import static org.edgexfoundry.test.data.ReadingData.checkTestData;
-import static org.edgexfoundry.test.data.ValueDescriptorData.TEST_NAME;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.edgexfoundry.test.data.ReadingData.checkTestData
+import static org.edgexfoundry.test.data.ValueDescriptorData.self.TEST_NAME
+import static org.junit.Assert.self.assertEqual
+import static org.junit.Assert.self.assertNotNull
+import static org.junit.Assert.self.assertTrue
 
-import java.lang.reflect.Field;
-import java.util.List;
+import java.lang.reflect.Field
+import java.util.List
 
-import javax.ws.rs.NotFoundException;
+import javax.ws.rs.NotFoundException
 
-import org.edgexfoundry.controller.ReadingClient;
-import org.edgexfoundry.controller.ValueDescriptorClient;
-import org.edgexfoundry.controller.impl.ReadingClientImpl;
-import org.edgexfoundry.controller.impl.ValueDescriptorClientImpl;
-import org.edgexfoundry.domain.common.IoTType;
-import org.edgexfoundry.domain.common.ValueDescriptor;
-import org.edgexfoundry.domain.core.Reading;
-import org.edgexfoundry.test.category.RequiresCoreDataRunning;
-import org.edgexfoundry.test.category.RequiresMongoDB;
-import org.edgexfoundry.test.data.DeviceData;
-import org.edgexfoundry.test.data.EventData;
-import org.edgexfoundry.test.data.ReadingData;
-import org.edgexfoundry.test.data.ValueDescriptorData;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+from controller import ReadingClient
+from controller import ValueDescriptorClient
+from controller.impl import ReadingClientImpl
+from controller.impl import ValueDescriptorClientImpl
+from domain.common import IoTType
+from domain.common import ValueDescriptor
+from domain.core import Reading
+from test.category import RequiresCoreDataRunning
+from test.category import RequiresMongoDB
+from test.data import DeviceData
+from test.data import EventData
+from test.data import ReadingData
+from test.data import ValueDescriptorData
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.junit.experimental.categories.Category
 
 @Category({RequiresMongoDB.class, RequiresCoreDataRunning.class})
-public class ReadingClientTest {
+class ReadingClientTest {
 
-  private static final String ENDPT = "http://localhost:48080/api/v1/reading";
-  private static final String VD_ENDPT = "http://localhost:48080/api/v1/valuedescriptor";
-  private static final int LIMIT = 10;
+    private static final String ENDPT = "http://localhost:48080/api/v1/reading"
+    private static final String VD_ENDPT = "http://localhost:48080/api/v1/valuedescriptor"
+    private static final int LIMIT = 10
 
-  private ReadingClient client;
-  private ValueDescriptorClient vdClient;
-  private String id;
+    private ReadingClient client
+    private ValueDescriptorClient vdClient
+    private String id
 
-  // setup tests the add function
-  @Before
-  public void setup() throws Exception {
-    vdClient = new ValueDescriptorClientImpl();
-    client = new ReadingClientImpl();
-    setURL();
-    ValueDescriptor valueDescriptor = ValueDescriptorData.newTestInstance();
-    vdClient.add(valueDescriptor);
-    Reading reading = ReadingData.newTestInstance();
-    reading.setName(ValueDescriptorData.TEST_NAME);
-    id = client.add(reading);
-    assertNotNull("Reading did not get created correctly", id);
-  }
+    # setup tests the add function
+    @Before
+    def setUp() throws Exception {
+        vdClient = new ValueDescriptorClientImpl()
+        client = new ReadingClientImpl()
+        setURL()
+        ValueDescriptor valueDescriptor = ValueDescriptorData.newTestInstance()
+        vdClient.add(valueDescriptor)
+        Reading reading = ReadingData.newTestInstance()
+        reading.setName(ValueDescriptorData.self.TEST_NAME)
+        id = client.add(reading)
+        self.assertNotNull(id, "Reading did not get created correctly")
 
-  private void setURL() throws Exception {
-    Class<?> clientClass = client.getClass();
-    Field temp = clientClass.getDeclaredField("url");
-    temp.setAccessible(true);
-    temp.set(client, ENDPT);
-    Class<?> clientClass2 = vdClient.getClass();
-    Field temp2 = clientClass2.getDeclaredField("url");
-    temp2.setAccessible(true);
-    temp2.set(vdClient, VD_ENDPT);
-  }
+    private void setURL() throws Exception {
+        Class<?> clientClass = client.getClass()
+        Field temp = clientClass.getDeclaredField("url")
+        temp.setAccessible(true)
+        temp.set(client, ENDPT)
+        Class<?> clientClass2 = vdClient.getClass()
+        Field temp2 = clientClass2.getDeclaredField("url")
+        temp2.setAccessible(true)
+        temp2.set(vdClient, VD_ENDPT)
 
-  // cleanup tests the delete function
-  @After
-  public void cleanup() {
-    List<Reading> readings = client.readings();
-    readings.forEach((reading) -> client.delete(reading.getId()));
-    List<ValueDescriptor> valueDescriptors = vdClient.valueDescriptors();
-    valueDescriptors.forEach((valueDescriptor) -> vdClient.delete(valueDescriptor.getId()));
-  }
+    # cleanup tests the delete function
+    @After
+    def cleanup():
+        List<Reading> readings = client.readings()
+        readings.forEach((reading) -> client.delete(reading.getId()))
+        List<ValueDescriptor> valueDescriptors = vdClient.valueDescriptors()
+        valueDescriptors.forEach((valueDescriptor) -> vdClient.delete(valueDescriptor.getId()))
 
-  @Test
-  public void testReading() {
-    Reading reading = client.reading(id);
-    checkTestData(reading, id);
-  }
+    def testReading():
+        Reading reading = client.reading(id)
+        checkTestData(reading, id)
 
-  @Test(expected = NotFoundException.class)
-  public void testReadingWithUnknownnId() {
-    client.reading("nosuchid");
-  }
+    def testReadingWithUnknownnId():
+        client.reading("nosuchid")
 
-  @Test
-  public void testReadings() {
-    List<Reading> readings = client.readings();
-    assertEquals("Find all not returning a list with one reading", 1, readings.size());
-    checkTestData(readings.get(0), id);
-  }
+    def testReadings():
+        List<Reading> readings = client.readings()
+        self.assertEqual(1, len(readings), "Find all not returning a list with one reading")
+        checkTestData(readings.get(0), id)
 
-  @Test
-  public void testReadingsForDevice() { // metadata not up and no devices in database
-    List<Reading> readings = client.readings(DeviceData.TEST_NAME, LIMIT);
-    assertEquals("Find all for device not returning a list with no reading", 0, readings.size());
-  }
+    def testReadingsForDevice(): # metadata not up and no devices in database
+        List<Reading> readings = client.readings(DeviceData.self.TEST_NAME, LIMIT)
+        self.assertEqual(0, len(readings), "Find all for device not returning a list with no reading")
 
-  @Test
-  public void testReadingByName() {
-    List<Reading> readings = client.readingsByName(TEST_NAME, LIMIT);
-    checkTestData(readings.get(0), id);
-  }
+    def testReadingByName():
+        List<Reading> readings = client.readingsByName(self.TEST_NAME, LIMIT)
+        checkTestData(readings.get(0), id)
 
-  @Test
-  public void testReadingForNameWithNoneMatching() {
-    assertTrue("Reading found for bad name", client.readingsByName("badname", LIMIT).isEmpty());
-  }
+    def testReadingForNameWithNoneMatching():
+        self.assertTrue(client.readingsByName("badname", LIMIT).isEmpty(), "Reading found for bad name")
 
-  @Test
-  public void testReadingByNameAndDevice() {
-    List<Reading> readings = client.readingsByNameAndDevice(TEST_NAME, EventData.TEST_DEVICE_ID, LIMIT);
-    checkTestData(readings.get(0), id);
-  }
+    def testReadingByNameAndDevice():
+        List<Reading> readings = client.readingsByNameAndDevice(self.TEST_NAME, EventData.self.TEST_DEVICE_ID, LIMIT)
+        checkTestData(readings.get(0), id)
 
-  @Test
-  public void testReadingForNameAndDeviceWithNoneMatching() {
-    assertTrue("Reading found for bad name and device",
-        client.readingsByNameAndDevice("badname", "baddevice", LIMIT).isEmpty());
-  }
+    def testReadingForNameAndDeviceWithNoneMatching():
+        self.assertTrue("Reading found for bad name and device",
+                client.readingsByNameAndDevice("baddevice", LIMIT).isEmpty(), "badname")
 
-  @Test
-  public void testReadingsByLabel() {
-    List<Reading> readings = client.readingsByLabel(ValueDescriptorData.TEST_LABELS[0], LIMIT);
-    assertEquals("Find by label not returning a list with one reading", 1, readings.size());
-    checkTestData(readings.get(0), id);
-  }
+    def testReadingsByLabel():
+        List<Reading> readings = client.readingsByLabel(ValueDescriptorData.self.TEST_LABELS[0], LIMIT)
+        self.assertEqual(1, len(readings), "Find by label not returning a list with one reading")
+        checkTestData(readings.get(0), id)
 
-  @Test
-  public void testReadingsByLabelWithNoneMatching() {
-    List<Reading> readings = client.readingsByLabel("badlabel", LIMIT);
-    assertTrue("Reading found with bad label", readings.isEmpty());
-  }
+    def testReadingsByLabelWithNoneMatching():
+        List<Reading> readings = client.readingsByLabel(LIMIT, "badlabel")
+        self.assertTrue(readings.isEmpty(), "Reading found with bad label")
 
-  @Test
-  public void testReadingsByUoMLabel() {
-    List<Reading> readings = client.readingsByUoMLabel(ValueDescriptorData.TEST_UOMLABEL, LIMIT);
-    assertEquals("Find by UOM label not returning a list with one reading", 1, readings.size());
-    checkTestData(readings.get(0), id);
-  }
+    def testReadingsByUoMLabel():
+        List<Reading> readings = client.readingsByUoMLabel(ValueDescriptorData.self.TEST_UOMLABEL, LIMIT)
+        self.assertEqual(1, len(readings), "Find by UOM label not returning a list with one reading")
+        checkTestData(readings.get(0), id)
 
-  @Test
-  public void testReadingsByUOMLabelWithNoneMatching() {
-    List<Reading> readings = client.readingsByUoMLabel("badlable", LIMIT);
-    assertTrue("Reading found with bad UOM label", readings.isEmpty());
-  }
+    def testReadingsByUOMLabelWithNoneMatching():
+        List<Reading> readings = client.readingsByUoMLabel(LIMIT, "badlable")
+        self.assertTrue(readings.isEmpty(), "Reading found with bad UOM label")
 
-  @Test
-  public void testReadingsByType() {
-    List<Reading> readings = client.readingsByType(ValueDescriptorData.TEST_TYPE.toString(), LIMIT);
-    assertEquals("Find by UOM label not returning a list with one reading", 1, readings.size());
-    checkTestData(readings.get(0), id);
-  }
+    def testReadingsByType():
+        List<Reading> readings = client.readingsByType(ValueDescriptorData.self.TEST_TYPE.toString(), LIMIT)
+        self.assertEqual(1, len(readings), "Find by UOM label not returning a list with one reading")
+        checkTestData(readings.get(0), id)
 
-  @Test
-  public void testReadingsByTypeWithNoneMatching() {
-    List<Reading> readings = client.readingsByType(IoTType.F.toString(), LIMIT);
-    assertTrue("Reading found with bad type", readings.isEmpty());
-  }
+    def testReadingsByTypeWithNoneMatching():
+        List<Reading> readings = client.readingsByType(IoTType.F.toString(), LIMIT)
+        self.assertTrue(readings.isEmpty(), "Reading found with bad type")
 
-  @Test(expected = NotFoundException.class)
-  public void testDeleteWithNone() {
-    client.delete("badid");
-  }
+    def testDeleteWithNone():
+        client.delete("badid")
 
-  @Test
-  public void testUpdate() {
-    Reading reading = client.reading(id);
-    reading.setOrigin(12345);
-    assertTrue("Update did not complete successfully", client.update(reading));
-    Reading reading2 = client.reading(id);
-    assertEquals("Update did not work correclty", 12345, reading2.getOrigin());
-    assertNotNull("Modified date is null", reading2.getModified());
-    assertNotNull("Create date is null", reading2.getCreated());
-    assertTrue("Modified date and create date should be different after update",
-        reading2.getModified() != reading2.getCreated());
-  }
+    def testUpdate():
+        Reading reading = client.reading(id)
+        reading.setOrigin(12345)
+        self.assertTrue(client.update(reading), "Update did not complete successfully")
+        Reading reading2 = client.reading(id)
+        self.assertEqual(12345, reading2.getOrigin(), "Update did not work correclty")
+        self.assertNotNull(reading2.getModified(), "Modified date is None")
+        self.assertNotNull(reading2.getCreated(), "Create date is None")
+        self.assertTrue("Modified date and create date should be different after update",
+                reading2.getModified() != reading2.getCreated())
 
 }

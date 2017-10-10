@@ -1,4 +1,4 @@
-/*******************************************************************************
+#*******************************************************************************
  * Copyright 2016-2017 Dell Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -16,63 +16,62 @@
  * @version: 1.0.0
  *******************************************************************************/
 
-package org.edgexfoundry.controller;
 
-import java.util.List;
+import java.util.List
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.Consumes
+import javax.ws.rs.DELETE
+import javax.ws.rs.GET
+import javax.ws.rs.POST
+import javax.ws.rs.PUT
+import javax.ws.rs.Path
+import javax.ws.rs.PathParam
 
-import org.edgexfoundry.domain.common.ValueDescriptor;
+from domain.common import ValueDescriptor
 
 public interface ValueDescriptorClient {
 
-  @GET
-  @Path("/{id}")
-  ValueDescriptor valueDescriptor(@PathParam("id") String id);
+    @GET
+    @Path("/{id}")
+    ValueDescriptor valueDescriptor(@PathParam("id") String id)
 
-  @GET
-  List<ValueDescriptor> valueDescriptors();
+    @GET
+    List<ValueDescriptor> valueDescriptors()
 
-  @GET
-  @Path("/name/{name:.+}")
-  ValueDescriptor valueDescriptorByName(@PathParam("name") String name);
+    @GET
+    @Path("/name/{name:.+}")
+    ValueDescriptor valueDescriptorByName(@PathParam("name") String name)
 
-  @GET
-  @Path("/uomlabel/{uomLabel:.+}")
-  List<ValueDescriptor> valueDescriptorByUOMLabel(@PathParam("uomLabel") String uomLabel);
+    @GET
+    @Path("/uomlabel/{uomLabel:.+}")
+    List<ValueDescriptor> valueDescriptorByUOMLabel(@PathParam("uomLabel") String uomLabel)
 
-  @GET
-  @Path("/label/{label:.+}")
-  List<ValueDescriptor> valueDescriptorByLabel(@PathParam("label") String label);
+    @GET
+    @Path("/label/{label:.+}")
+    List<ValueDescriptor> valueDescriptorByLabel(@PathParam("label") String label)
 
-  @GET
-  @Path("/devicename/{name:.+}")
-  List<ValueDescriptor> valueDescriptorsForDeviceByName(@PathParam("name") String name);
+    @GET
+    @Path("/devicename/{name:.+}")
+    List<ValueDescriptor> valueDescriptorsForDeviceByName(@PathParam("name") String name)
 
-  @GET
-  @Path("/deviceid/{id}")
-  List<ValueDescriptor> valueDescriptorsForDeviceById(@PathParam("id") String id);
+    @GET
+    @Path("/deviceid/{id}")
+    List<ValueDescriptor> valueDescriptorsForDeviceById(@PathParam("id") String id)
 
-  @POST
-  @Consumes("application/json")
-  String add(ValueDescriptor valueDescriptor);
+    @POST
+    @Consumes("application/json")
+    String add(ValueDescriptor valueDescriptor)
 
-  @PUT
-  @Consumes("application/json")
-  boolean update(ValueDescriptor valueDescriptor);
+    @PUT
+    @Consumes("application/json")
+    boolean update(ValueDescriptor valueDescriptor)
 
-  @DELETE
-  @Path("/id/{id}")
-  boolean delete(@PathParam("id") String id);
+    @DELETE
+    @Path("/id/{id}")
+    boolean delete(@PathParam("id") String id)
 
-  @DELETE
-  @Path("/name/{name:.+}")
-  boolean deleteByName(@PathParam("name") String name);
+    @DELETE
+    @Path("/name/{name:.+}")
+    boolean deleteByName(@PathParam("name") String name)
 
 }

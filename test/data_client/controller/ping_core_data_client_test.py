@@ -1,4 +1,4 @@
-/*******************************************************************************
+#*******************************************************************************
  * Copyright 2016-2017 Dell Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -16,43 +16,38 @@
  * @version: 1.0.0
  *******************************************************************************/
 
-package org.edgexfoundry.controller.integration;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.self.assertEqual
 
-import java.lang.reflect.Field;
+import java.lang.reflect.Field
 
-import org.edgexfoundry.controller.PingCoreDataClient;
-import org.edgexfoundry.controller.impl.PingCoreDataClientImpl;
-import org.edgexfoundry.test.category.RequiresCoreDataRunning;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+from controller import PingCoreDataClient
+from controller.impl import PingCoreDataClientImpl
+from test.category import RequiresCoreDataRunning
+import org.junit.Before
+import org.junit.Test
+import org.junit.experimental.categories.Category
 
 @Category({RequiresCoreDataRunning.class})
-public class PingCoreDataClientTest {
+class PingCoreDataClientTest {
 
-  private static final String ENDPT = "http://localhost:48080/api/v1/ping";
+    private static final String ENDPT = "http://localhost:48080/api/v1/ping"
 
-  private PingCoreDataClient client;
+    private PingCoreDataClient client
 
-  // setup tests the add function
-  @Before
-  public void setup() throws Exception {
-    client = new PingCoreDataClientImpl();
-    setURL();
-  }
+    # setup tests the add function
+    @Before
+    def setUp() throws Exception {
+        client = new PingCoreDataClientImpl()
+        setURL()
 
-  private void setURL() throws Exception {
-    Class<?> clientClass = client.getClass();
-    Field temp = clientClass.getDeclaredField("url");
-    temp.setAccessible(true);
-    temp.set(client, ENDPT);
-  }
+    private void setURL() throws Exception {
+        Class<?> clientClass = client.getClass()
+        Field temp = clientClass.getDeclaredField("url")
+        temp.setAccessible(true)
+        temp.set(client, ENDPT)
 
-  @Test
-  public void testPing() {
-    assertEquals("Ping Core Data Micro Service failed", "pong", client.ping());
-  }
+    def testPing():
+        self.assertEqual("pong", client.ping(), "Ping Core Data Micro Service failed")
 
 }

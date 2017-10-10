@@ -1,4 +1,4 @@
-/*******************************************************************************
+#*******************************************************************************
  * Copyright 2016-2017 Dell Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
@@ -16,13 +16,12 @@
  * @version: 1.0.0
  *******************************************************************************/
 
-package org.edgexfoundry.controller;
 
-import javax.ws.rs.GET;
+import javax.ws.rs.GET
 
 public interface PingCoreDataClient {
 
-  @GET
-  String ping();
+    @GET
+    String ping()
 
 }
