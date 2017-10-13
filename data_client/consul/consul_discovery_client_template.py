@@ -16,61 +16,53 @@
 # @version: 1.0.0
 # *******************************************************************************
 
+import abc
+import consul
+from domain.config import config_reader
 
-import java.net.URI
-import java.util.List
 
-import javax.annotation.PostConstruct
+class ConsulDiscoveryClientTemplate(object):
 
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.cloud.client.ServiceInstance
-import org.springframework.cloud.client.discovery.DiscoveryClient
+    __metaclass__ = abc.ABCMeta
+    APP_ID = "edgex-core-data"
+    IS_CACHE_DISCOVERY_RESULT = config_reader.read_property(
+        "client.is-cache-discovery-result", False)
+    rootUrl = ""
+    path = ""
+    
+    def __init__(self):
+        self.rootUrl = self.retrieveUriFromDiscoveryClient()
+        self.path = self.extractPath()
 
-class ConsulDiscoveryClientTemplate {
+    def setIsCacheDiscoveryResult(self, flag):
+        self.IS_CACHE_DISCOVERY_RESULT = flag
 
-    public static final String APP_ID = "edgex-core-data"
-    private static boolean isCacheDiscoveryResult = false
-
-    @Value("${client.is-cache-discovery-result:false}")
-    public static void setIsCacheDiscoveryResult(boolean flag):
-        isCacheDiscoveryResult = flag
-
-    @Autowired
-    private DiscoveryClient discoveryClient
-
-    private String rootUrl = ""
-    private String path = ""
-
-    @PostConstruct
-    private void initClient():
-        rootUrl = retrieveUriFromDiscoveryClient()
-        path = extractPath()
-
-    private String retrieveUriFromDiscoveryClient():
+    def retrieveUriFromDiscoveryClient(self):
         String result = ""
         if (discoveryClient is None):
             return result
 
-        List<ServiceInstance> list = discoveryClient.getInstances(APP_ID)
-        if (list != None && !list.isEmpty()):
-            URI uri = list.get(0).getUri()
-            if (uri != None):
+        discover_list = discoveryClient.getInstances(APP_ID)
+        if discover_list:
+            uri = discover_list[0].uri
+            if uri is not None:
                 result = uri.toString()
         return result
 
-    protected abstract String extractPath()
+    @abc.abstractmethod
+    def extractPath(self):
+        return
 
-    public String getRootUrl():
-        if (rootUrl is None || rootUrl.isEmpty() || !isCacheDiscoveryResult):
-            String retrievedUri = retrieveUriFromDiscoveryClient()
-            if (retrievedUri != None && !retrievedUri.isEmpty()):
-                rootUrl = retrievedUri
-        return rootUrl
+    def getRootUrl(self):
+        if self.rootUrl and not self.IS_CACHE_DISCOVERY_RESULT:
+            retrievedUri = self.retrieveUriFromDiscoveryClient()
+            if retrievedUri:
+                self.rootUrl = retrievedUri
+        return self.rootUrl
 
-    public String getPath():
-        if (path is None || path.isEmpty()):
-            path = extractPath()
+    def getPath():
+        if not path:
+            path = self.extractPath()
         return path
 
 }
